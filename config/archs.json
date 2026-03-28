@@ -1,0 +1,69 @@
+{
+    "normalize_to": "x86-64-v3",
+    "cflags": "-O2 -pipe -falign-functions=1 -falign-jumps=1 -falign-loops=1 -falign-labels=1",
+    "groups": [
+        {
+            "label": "CISC",
+            "archs": [
+                {
+                    "id": "i686",
+                    "label": "i686",
+                    "triple": "i686-linux-musl",
+                    "cflags": ""
+                },
+                {
+                    "id": "x86-64-v3",
+                    "label": "x86-64-v3",
+                    "triple": "x86_64-linux-musl",
+                    "cflags": ""
+                },
+                {
+                    "id": "s390x-z16",
+                    "label": "z16",
+                    "triple": "s390x-linux-musl",
+                    "cflags": ""
+                }
+            ]
+        },
+        {
+            "label": "RISC",
+            "archs": [
+                {
+                    "id": "armv7a-arm",
+                    "label": "ARMv7-A",
+                    "triple": "arm-linux-musleabi",
+                    "cflags": ""
+                },
+                {
+                    "id": "armv8.2a-aarch64",
+                    "label": "ARMv8.2-A",
+                    "triple": "aarch64-linux-musl",
+                    "cflags": ""
+                },
+                {
+                    "id": "ppc64le-power10",
+                    "label": "Power10",
+                    "triple": "powerpc64le-linux-musl",
+                    "cflags": ""
+                }
+            ]
+        },
+        {
+            "label": "Compressed",
+            "archs": [
+                {
+                    "id": "armv7m",
+                    "label": "ARMv7-M",
+                    "triple": "arm-linux-musleabi",
+                    "cflags": ""
+                },
+                {
+                    "id": "rva23u64",
+                    "label": "RVA23U64",
+                    "triple": "riscv64-linux-musl",
+                    "cflags": ""
+                }
+            ]
+        }
+    ]
+}

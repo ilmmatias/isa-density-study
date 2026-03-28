@@ -1,0 +1,6 @@
+**/.work/
+**/.artifacts/
+**/.prefix/
+.tarballs/
+__pycache__/
+*.pyc
