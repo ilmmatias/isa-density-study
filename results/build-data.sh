@@ -4,11 +4,16 @@ set -euo pipefail
 
 RESULTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 . "$RESULTS_DIR/../config/env.sh"
+. "$RESULTS_DIR/../workloads/common.sh"
 
-verify_toolchains
-
+RESULTS_DATA_DIR="${RESULTS_DATA_DIR:-$RESULTS_DIR/data}"
+RESULTS_CSV="${RESULTS_CSV:-$RESULTS_DATA_DIR/results.csv}"
 WORKLOADS_DIR="$REPO_ROOT/workloads"
-mkdir -p "$RESULTS_DIR"
+
+mapfile -t TARGET_PROFILES < <(selected_profiles "${1:-}" "${2:-}")
+mapfile -t TARGET_ARCHS < <(selected_archs "${1:-}")
+
+mkdir -p "$RESULTS_DATA_DIR"
 
 tmpdirs=()
 cleanup() {
@@ -33,27 +38,8 @@ text_size() {
         END { print sum+0 }'
 }
 
-analyze_regular() {
-    local workload="$1" arch="$2" file="$3"
-    if [[ ! -f "$file" ]]; then
-        echo "Warning: missing file $file" >&2
-        return
-    fi
-
-    local text inst bpi
-    text=$(text_size "$arch" "$file")
-    inst=$(count_insts "$arch" "$file")
-    if [[ "$inst" -eq 0 ]]; then
-        bpi="NaN"
-    else
-        bpi=$(awk "BEGIN { printf \"%.4f\", $text / $inst }")
-    fi
-
-    printf '%s,%s,%s,%s,%s\n' "$workload" "$arch" "$text" "$inst" "$bpi"
-}
-
 analyze_archive() {
-    local workload="$1" arch="$2" archive="$3"
+    local workload="$1" arch="$2" profile="$3" archive="$4"
     if [[ ! -f "$archive" ]]; then
         echo "Warning: missing archive $archive" >&2
         return
@@ -82,23 +68,21 @@ analyze_archive() {
         bpi=$(awk "BEGIN { printf \"%.4f\", $text_total / $inst_total }")
     fi
 
-    printf '%s,%s,%s,%s,%s\n' "$workload" "$arch" "$text_total" "$inst_total" "$bpi"
+    printf '%s,%s,%s,%s,%s,%s\n' \
+        "$workload" "$arch" "$profile" "$text_total" "$inst_total" "$bpi"
 }
 
-echo "workload,arch,text_bytes,instruction_count,bytes_per_instruction" \
-    > "$RESULTS_DIR/results.csv"
+echo "workload,arch,profile,text_bytes,instruction_count,bytes_per_instruction" \
+    > "$RESULTS_CSV"
 
-for arch in "${ARCHS[@]}"; do
-    analyze_regular "busybox" "$arch" \
-        "$WORKLOADS_DIR/busybox/.artifacts/$arch/busybox"
-done >> "$RESULTS_DIR/results.csv"
+for workload_dir in "$WORKLOADS_DIR"/*; do
+    [[ -f "$workload_dir/workload.json" ]] || continue
+    load_workload_config "$workload_dir"
 
-for arch in "${ARCHS[@]}"; do
-    analyze_regular "sqlite" "$arch" \
-        "$WORKLOADS_DIR/sqlite/.artifacts/$arch/sqlite3.o"
-done >> "$RESULTS_DIR/results.csv"
-
-for arch in "${ARCHS[@]}"; do
-    analyze_archive "zlib" "$arch" \
-        "$WORKLOADS_DIR/zlib/.artifacts/$arch/libz.a"
-done >> "$RESULTS_DIR/results.csv"
+    for profile in "${TARGET_PROFILES[@]}"; do
+        for arch in "${TARGET_ARCHS[@]}"; do
+            analyze_archive "$WORKLOAD_ID" "$arch" "$profile" \
+                "$WORKLOAD_ARTIFACTS_DIR/$profile/$arch/$WORKLOAD_ARTIFACT"
+        done
+    done
+done >> "$RESULTS_CSV"

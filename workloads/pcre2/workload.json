@@ -1,0 +1,11 @@
+{
+    "id": "pcre2",
+    "label": "PCRE2",
+    "version": "10.46",
+    "tarball": "pcre2-10.46.tar.bz2",
+    "url": "https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.46/pcre2-10.46.tar.bz2",
+    "extract": "tar",
+    "artifact": "libpcre2-8.a",
+    "cflags": "",
+    "arch_cflags": {}
+}

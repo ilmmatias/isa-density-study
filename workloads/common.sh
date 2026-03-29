@@ -8,11 +8,12 @@ load_workload_config() {
     WORKLOAD_LABEL="$(jq -r '.label' "$json")"
     WORKLOAD_VERSION="$(jq -r '.version' "$json")"
     WORKLOAD_CFLAGS="$(jq -r '.cflags' "$json")"
+    WORKLOAD_ARTIFACT="$(jq -r '.artifact' "$json")"
 
     local tarball url sha256 extract
     tarball="$(jq -r '.tarball' "$json")"
     url="$(jq -r '.url' "$json")"
-    sha256="$(jq -r '.sha256' "$json")"
+    sha256="$(jq -r '.sha256 // empty' "$json")"
     extract="$(jq -r '.extract' "$json")"
 
     WORKLOAD_TARBALLS_DIR="$REPO_ROOT/.tarballs"
@@ -45,7 +46,9 @@ prepare_workload() {
         wget -q --show-progress -O "$WORKLOAD_TARBALL_FILE" "$WORKLOAD_URL"
     fi
 
-    echo "$WORKLOAD_SHA256  $WORKLOAD_TARBALL_FILE" | sha256sum -c --quiet
+    if [[ -n "$WORKLOAD_SHA256" ]]; then
+        echo "$WORKLOAD_SHA256  $WORKLOAD_TARBALL_FILE" | sha256sum -c --quiet
+    fi
 
     if [[ ! -d "$WORKLOAD_SRC_DIR" ]]; then
         echo "$WORKLOAD_ID: extracting..."
@@ -58,7 +61,7 @@ prepare_workload() {
 }
 
 workload_cflags() {
-    local arch="$1"
+    local arch="$1" profile="$2"
     local extra="${WORKLOAD_ARCH_CFLAGS[$arch]:-}"
-    echo "$(arch_cflags "$arch")${WORKLOAD_CFLAGS:+ $WORKLOAD_CFLAGS}${extra:+ $extra}"
+    echo "$(arch_cflags "$arch" "$profile")${WORKLOAD_CFLAGS:+ $WORKLOAD_CFLAGS}${extra:+ $extra}"
 }

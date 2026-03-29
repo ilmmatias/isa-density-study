@@ -3,6 +3,7 @@
 import csv
 import json
 import math
+import os
 from collections import defaultdict
 from pathlib import Path
 
@@ -18,44 +19,52 @@ REPO_ROOT = SCRIPT_DIR.parent
 CONFIG_DIR = REPO_ROOT / "config"
 WORKLOADS_DIR = REPO_ROOT / "workloads"
 
-INPUT_CSV = SCRIPT_DIR / "results.csv"
-OUTPUT_TEXT_SIZE_PNG = SCRIPT_DIR / "results-text-size.png"
-OUTPUT_BPI_PNG = SCRIPT_DIR / "results-bpi.png"
-OUTPUT_ICOUNT_PNG = SCRIPT_DIR / "results-icount.png"
-
 ARCH_CONFIG = CONFIG_DIR / "archs.json"
+DEFAULT_INPUT_CSV = SCRIPT_DIR / "data" / "results.csv"
+DEFAULT_PLOTS_DIR = SCRIPT_DIR / "plots"
 
 
 METRIC_INFO = {
-    "text_bytes": {
-        "title": ".text section size",
-        "fmt": "+.1f",
-    },
-    "instruction_count": {
-        "title": "Instruction count",
-        "fmt": "+.1f",
-    },
-    "bytes_per_instruction": {
-        "title": "Bytes per instruction",
-        "fmt": "+.1f",
-    },
+    "text_bytes": {"title": ".text section size", "fmt": "+.1f", "slug": "text-size"},
+    "instruction_count": {"title": "Instruction count", "fmt": "+.1f", "slug": "icount"},
+    "bytes_per_instruction": {"title": "Bytes per instruction", "fmt": "+.1f", "slug": "bpi"},
 }
 
 
-def load_arch_config(path: Path) -> tuple[dict[str, str], list[tuple[str, list[str]]], str | None]:
+def load_arch_config(
+    path: Path,
+) -> tuple[
+    dict[str, str],
+    dict[int, list[tuple[str, list[str]]]],
+    dict[str, int],
+    dict[int, str],
+    list[tuple[str, str]],
+]:
     with open(path, "r", encoding="utf-8") as f:
         data = json.load(f)
 
     labels: dict[str, str] = {}
-    groups: list[tuple[str, list[str]]] = []
-    for group in data["groups"]:
-        arch_ids = []
-        for arch in group["archs"]:
-            labels[arch["id"]] = arch["label"]
-            arch_ids.append(arch["id"])
-        groups.append((group["label"], arch_ids))
+    groups_by_bitness: dict[int, list[tuple[str, list[str]]]] = {}
+    arch_bitness: dict[str, int] = {}
+    normalize_by_bitness: dict[int, str] = {}
 
-    return labels, groups, data.get("normalize_to")
+    for bitness in data["bitness"]:
+        bits = int(bitness["bits"])
+        normalize_by_bitness[bits] = bitness["normalize"]
+
+        groups: list[tuple[str, list[str]]] = []
+        for group in bitness["groups"]:
+            arch_ids: list[str] = []
+            for arch in group["archs"]:
+                labels[arch["id"]] = arch["label"]
+                arch_bitness[arch["id"]] = bits
+                arch_ids.append(arch["id"])
+            groups.append((group["label"], arch_ids))
+
+        groups_by_bitness[bits] = groups
+
+    profiles = [(profile["id"], profile["label"]) for profile in data["profiles"]]
+    return labels, groups_by_bitness, arch_bitness, normalize_by_bitness, profiles
 
 
 def load_workloads(workloads_dir: Path) -> list[tuple[str, str]]:
@@ -69,7 +78,7 @@ def load_workloads(workloads_dir: Path) -> list[tuple[str, str]]:
 
 def load_results(path: Path) -> list[dict]:
     rows = []
-    with open(path, "r", newline="", encoding="utf-8") as f:
+    with open(path, newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         for row in reader:
             row["text_bytes"] = int(row["text_bytes"])
@@ -79,31 +88,45 @@ def load_results(path: Path) -> list[dict]:
     return rows
 
 
+def filter_rows(
+    rows: list[dict],
+    profile: str,
+    target_bitness: int,
+    arch_bitness: dict[str, int],
+) -> list[dict]:
+    return [
+        row for row in rows
+        if row["profile"] == profile and arch_bitness.get(row["arch"]) == target_bitness
+    ]
+
+
 def build_metric_table(
     rows: list[dict],
     metric: str,
-    normalize_to: str | None = None,
+    normalize: str | None,
 ) -> dict[str, dict[str, float]]:
     raw: dict[str, dict[str, float]] = defaultdict(dict)
 
     for row in rows:
         raw[row["workload"]][row["arch"]] = float(row[metric])
 
-    if normalize_to is None:
+    if normalize is None:
         return raw
 
     normalized: dict[str, dict[str, float]] = defaultdict(dict)
     for workload, arch_map in raw.items():
-        base = arch_map.get(normalize_to)
+        base = arch_map.get(normalize)
         if base is None or base == 0:
             continue
         for arch, value in arch_map.items():
             normalized[workload][arch] = value / base
-
     return normalized
 
 
-def existing_arches(rows: list[dict], arch_groups: list[tuple[str, list[str]]]) -> list[str]:
+def existing_arches(
+    rows: list[dict],
+    arch_groups: list[tuple[str, list[str]]],
+) -> list[str]:
     present = {row["arch"] for row in rows}
     ordered = [arch for _, group in arch_groups for arch in group if arch in present]
     extras = sorted(present - set(ordered))
@@ -115,37 +138,35 @@ def build_matrix(
     metric: str,
     arch_groups: list[tuple[str, list[str]]],
     workloads: list[tuple[str, str]],
-    normalize_to: str | None,
+    normalize: str | None,
 ) -> tuple[np.ndarray, list[str], list[str], list[tuple[str, int, int]], bool]:
-    table = build_metric_table(rows, metric, normalize_to=normalize_to)
+    table = build_metric_table(rows, metric, normalize)
     arches = existing_arches(rows, arch_groups)
 
     matrix = np.full((len(arches), len(workloads)), np.nan, dtype=float)
     for row_idx, arch in enumerate(arches):
         for col_idx, (workload_id, _) in enumerate(workloads):
             value = table.get(workload_id, {}).get(arch)
-            if value is not None and not math.isnan(value):
-                if normalize_to is not None:
-                    matrix[row_idx, col_idx] = (value - 1.0) * 100.0
-                else:
-                    matrix[row_idx, col_idx] = value
+            if value is None or math.isnan(value):
+                continue
+            matrix[row_idx, col_idx] = (value - 1.0) * 100.0 if normalize else value
 
-    labels = [arch for _, arch in workloads]
-    arch_labels = arches
+    workload_labels = [label for _, label in workloads]
 
     group_spans: list[tuple[str, int, int]] = []
     pos = 0
-    present_set = set(arches)
+    present = set(arches)
     for group_label, group_arches in arch_groups:
-        present_in_group = [a for a in group_arches if a in present_set]
+        present_in_group = [arch for arch in group_arches if arch in present]
         if not present_in_group:
             continue
+
         start = pos
         end = pos + len(present_in_group) - 1
         group_spans.append((group_label, start, end))
         pos += len(present_in_group)
 
-    return matrix, arch_labels, labels, group_spans, normalize_to is not None
+    return matrix, arches, workload_labels, group_spans, normalize is not None
 
 
 def metric_range(matrix: np.ndarray) -> tuple[float, float]:
@@ -155,7 +176,7 @@ def metric_range(matrix: np.ndarray) -> tuple[float, float]:
 
     bound = float(np.nanmax(np.abs(finite)))
     if bound == 0:
-        bound = 1.0
+        return -1.0, 1.0
     return -bound, bound
 
 
@@ -165,7 +186,6 @@ def add_group_annotations(ax: plt.Axes, group_spans: list[tuple[str, int, int]])
     for idx, (group_label, start, end) in enumerate(group_spans):
         if idx > 0:
             y = start - 0.5
-
             ax.plot(
                 [-0.08, 1.02],
                 [y, y],
@@ -196,11 +216,9 @@ def annotate_cells(ax: plt.Axes, matrix: np.ndarray, fmt: str) -> None:
         for col in range(matrix.shape[1]):
             value = matrix[row, col]
             if not np.isfinite(value):
-                ax.text(col, row, "–", ha="center", va="center", fontsize=10, alpha=0.5)
+                ax.text(col, row, "-", ha="center", va="center", fontsize=10, alpha=0.5)
                 continue
-
-            text = f"{format(value, fmt)}%"
-            ax.text(col, row, text, ha="center", va="center", fontsize=10)
+            ax.text(col, row, f"{format(value, fmt)}%", ha="center", va="center", fontsize=10)
 
 
 def plot_heatmap(
@@ -214,7 +232,6 @@ def plot_heatmap(
     normalized: bool,
 ) -> None:
     masked = np.ma.masked_invalid(matrix)
-
     vmin, vmax = metric_range(matrix)
     image = ax.imshow(
         masked,
@@ -228,8 +245,7 @@ def plot_heatmap(
     ax.set_xticks(np.arange(len(workload_labels)))
     ax.set_xticklabels(workload_labels)
     ax.set_yticks(np.arange(len(arch_labels)))
-    ax.set_yticklabels([pretty_arch_labels.get(a, a) for a in arch_labels])
-
+    ax.set_yticklabels([pretty_arch_labels.get(arch, arch) for arch in arch_labels])
     ax.set_xticks(np.arange(-0.5, len(workload_labels), 1), minor=True)
     ax.set_yticks(np.arange(-0.5, len(arch_labels), 1), minor=True)
     ax.grid(which="minor", color="white", linewidth=1.2)
@@ -245,27 +261,37 @@ def plot_heatmap(
 def plot_metric(
     rows: list[dict],
     output_path: Path,
-    arch_labels: dict[str, str],
+    arch_labels_map: dict[str, str],
     arch_groups: list[tuple[str, list[str]]],
     workloads: list[tuple[str, str]],
+    profile_label: str,
+    target_bitness: int,
     metric: str,
-    normalize_to: str | None,
+    normalize: str | None,
 ) -> None:
     matrix, arches, workload_labels, group_spans, normalized = build_matrix(
-        rows, metric, arch_groups, workloads, normalize_to
+        rows,
+        metric,
+        arch_groups,
+        workloads,
+        normalize,
     )
+    if matrix.size == 0:
+        return
 
     height = max(4.5, 0.52 * len(arches) + 1.4)
     width = max(6.0, 1.4 * len(workload_labels) + 3.6)
-
     fig, ax = plt.subplots(figsize=(width, height))
     fig.subplots_adjust(left=0.22, right=0.88)
-    plot_heatmap(ax, matrix, arches, workload_labels, group_spans, arch_labels, metric, normalized)
+    plot_heatmap(ax, matrix, arches, workload_labels, group_spans, arch_labels_map, metric, normalized)
 
-    baseline_text = f"Baseline: {arch_labels.get(normalize_to, normalize_to)}" if normalized and normalize_to else None
+    baseline_text = f"Baseline: {arch_labels_map.get(normalize, normalize)}" if normalize else None
+    title = f"{profile_label} | {target_bitness}-bit"
     if baseline_text:
-        fig.suptitle(baseline_text, fontsize=12, y=0.98)
+        title += f" | {baseline_text}"
+    fig.suptitle(title, fontsize=12, y=0.98)
 
+    output_path.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(output_path, dpi=220, bbox_inches="tight")
     plt.close(fig)
 
@@ -279,27 +305,35 @@ def main() -> None:
         "ytick.labelsize": 11,
     })
 
-    arch_labels, arch_groups, normalize_to = load_arch_config(ARCH_CONFIG)
+    input_csv = Path(os.environ.get("RESULTS_CSV", str(DEFAULT_INPUT_CSV)))
+    plots_dir = Path(os.environ.get("RESULTS_PLOTS_DIR", str(DEFAULT_PLOTS_DIR)))
+
+    arch_labels_map, arch_groups_by_bitness, arch_bitness, normalize_by_bitness, profiles = load_arch_config(ARCH_CONFIG)
     workloads = load_workloads(WORKLOADS_DIR)
-
-    rows = load_results(INPUT_CSV)
+    rows = load_results(input_csv)
     if not rows:
-        raise RuntimeError("results.csv is empty")
+        raise RuntimeError(f"{input_csv} is empty")
 
-    for output, metric in [
-        (OUTPUT_TEXT_SIZE_PNG, "text_bytes"),
-        (OUTPUT_BPI_PNG, "bytes_per_instruction"),
-        (OUTPUT_ICOUNT_PNG, "instruction_count"),
-    ]:
-        plot_metric(
-            rows,
-            output,
-            arch_labels=arch_labels,
-            arch_groups=arch_groups,
-            workloads=workloads,
-            metric=metric,
-            normalize_to=normalize_to,
-        )
+    for profile_id, profile_label in profiles:
+        for target_bitness, arch_groups in arch_groups_by_bitness.items():
+            subset = filter_rows(rows, profile_id, target_bitness, arch_bitness)
+            if not subset:
+                continue
+
+            normalize = normalize_by_bitness.get(target_bitness)
+            for metric in ("text_bytes", "bytes_per_instruction", "instruction_count"):
+                output_path = plots_dir / f"{profile_id}-{target_bitness}-bit-{METRIC_INFO[metric]['slug']}.png"
+                plot_metric(
+                    subset,
+                    output_path,
+                    arch_labels_map=arch_labels_map,
+                    arch_groups=arch_groups,
+                    workloads=workloads,
+                    profile_label=profile_label,
+                    target_bitness=target_bitness,
+                    metric=metric,
+                    normalize=normalize,
+                )
 
 
 if __name__ == "__main__":

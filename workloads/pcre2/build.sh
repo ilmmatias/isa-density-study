@@ -10,25 +10,29 @@ WORKLOAD_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 load_workload_config "$WORKLOAD_DIR"
 prepare_workload
 
-build_zlib() {
+build_pcre2() {
     local arch="$1" profile="$2"
     local build_dir="$WORKLOAD_WORK_DIR/$profile/$arch"
     local artifacts_dir="$WORKLOAD_ARTIFACTS_DIR/$profile/$arch"
     mkdir -p "$build_dir" "$artifacts_dir"
 
-    echo "$arch/$profile: zlib: configuring..."
+    echo "$arch/$profile: pcre2: configuring..."
     cd "$build_dir"
     CC="$(arch_gcc "$arch")" \
     AR="$(arch_ar "$arch")" \
     RANLIB="$(arch_tool "$arch" ranlib)" \
     CFLAGS="$(workload_cflags "$arch" "$profile")" \
-    "$WORKLOAD_SRC_DIR/configure" --static
+    "$WORKLOAD_SRC_DIR/configure" \
+        --host="$(arch_triple "$arch")" \
+        --disable-shared \
+        --enable-static \
+        --disable-jit
 
-    echo "$arch/$profile: zlib: building..."
-    make libz.a -j"$(nproc)"
+    echo "$arch/$profile: pcre2: building..."
+    make libpcre2-8.la -j"$(nproc)"
 
-    cp "$build_dir/libz.a" "$artifacts_dir/libz.a"
-    echo "$arch/$profile: zlib: done"
+    cp "$build_dir/.libs/libpcre2-8.a" "$artifacts_dir/libpcre2-8.a"
+    echo "$arch/$profile: pcre2: done"
 }
 
 mapfile -t TARGET_ARCHS < <(selected_archs "${1:-}")
@@ -36,6 +40,6 @@ mapfile -t TARGET_PROFILES < <(selected_profiles "${1:-}" "${2:-}")
 
 for profile in "${TARGET_PROFILES[@]}"; do
     for arch in "${TARGET_ARCHS[@]}"; do
-        build_zlib "$arch" "$profile"
+        build_pcre2 "$arch" "$profile"
     done
 done
