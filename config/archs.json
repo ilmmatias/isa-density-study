@@ -18,6 +18,12 @@
                     "cflags": ""
                 },
                 {
+                    "id": "x86-64-vnext",
+                    "label": "x86-64-vnext",
+                    "triple": "x86_64-linux-musl",
+                    "cflags": ""
+                },
+                {
                     "id": "s390x-z16",
                     "label": "z16",
                     "triple": "s390x-linux-musl",
