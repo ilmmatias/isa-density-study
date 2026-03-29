@@ -5,88 +5,26 @@
         {
             "label": "CISC",
             "archs": [
-                {
-                    "id": "i686",
-                    "label": "i686",
-                    "triple": "i686-linux-musl",
-                    "cflags": ""
-                },
-                {
-                    "id": "x86-64-v1",
-                    "label": "x64-v1",
-                    "triple": "x86_64-linux-musl",
-                    "cflags": ""
-                },
-                {
-                    "id": "x86-64-v3",
-                    "label": "x64-v3",
-                    "triple": "x86_64-linux-musl",
-                    "cflags": ""
-                },
-                {
-                    "id": "x86-64-vnext",
-                    "label": "x64-apx",
-                    "triple": "x86_64-linux-musl",
-                    "cflags": ""
-                },
-                {
-                    "id": "s390x-z16",
-                    "label": "z16",
-                    "triple": "s390x-linux-musl",
-                    "cflags": ""
-                }
+                { "id": "m68k", "label": "m68k", "triple": "m68k-linux-musl", "cflags": "" },
+                { "id": "i686", "label": "i686", "triple": "i686-linux-musl", "cflags": "" },
+                { "id": "x86-64-v1", "label": "x64-v1", "triple": "x86_64-linux-musl", "cflags": "" },
+                { "id": "x86-64-v3", "label": "x64-v3", "triple": "x86_64-linux-musl", "cflags": "" },
+                { "id": "x86-64-vnext", "label": "x64-apx", "triple": "x86_64-linux-musl", "cflags": "" },
+                { "id": "s390x-z16", "label": "z16", "triple": "s390x-linux-musl", "cflags": "" }
             ]
         },
         {
             "label": "RISC",
             "archs": [
-                {
-                    "id": "armv7a-arm",
-                    "label": "ARMv7-A",
-                    "triple": "arm-linux-musleabi",
-                    "cflags": ""
-                },
-                {
-                    "id": "armv8.2a-aarch64",
-                    "label": "ARMv8.2",
-                    "triple": "aarch64-linux-musl",
-                    "cflags": ""
-                },
-                {
-                    "id": "armv9.5a-aarch64",
-                    "label": "ARMv9.5",
-                    "triple": "aarch64-linux-musl",
-                    "cflags": ""
-                },
-                {
-                    "id": "rv64g",
-                    "label": "RV64G",
-                    "triple": "riscv64-linux-musl",
-                    "cflags": ""
-                },
-                {
-                    "id": "ppc64le-power10",
-                    "label": "Power10",
-                    "triple": "powerpc64le-linux-musl",
-                    "cflags": ""
-                }
-            ]
-        },
-        {
-            "label": "Compressed",
-            "archs": [
-                {
-                    "id": "armv7m",
-                    "label": "ARMv7-M",
-                    "triple": "arm-linux-musleabi",
-                    "cflags": ""
-                },
-                {
-                    "id": "rva23u64",
-                    "label": "RVA23",
-                    "triple": "riscv64-linux-musl",
-                    "cflags": ""
-                }
+                { "id": "mips32r6", "label": "MIPS32r6", "triple": "mipsel-linux-musl", "cflags": "" },
+                { "id": "mips64r6", "label": "MIPS64r6", "triple": "mips64el-linux-musl", "cflags": "" },
+                { "id": "armv7a-arm", "label": "ARMv7-A", "triple": "arm-linux-musleabi", "cflags": "" },
+                { "id": "armv7m", "label": "ARMv7-M", "triple": "arm-linux-musleabi", "cflags": "" },
+                { "id": "armv8.2a-aarch64", "label": "ARMv8.2", "triple": "aarch64-linux-musl", "cflags": "" },
+                { "id": "armv9.5a-aarch64", "label": "ARMv9.5", "triple": "aarch64-linux-musl", "cflags": "" },
+                { "id": "rv64g", "label": "RV64G", "triple": "riscv64-linux-musl", "cflags": "" },
+                { "id": "rva23u64", "label": "RVA23", "triple": "riscv64-linux-musl", "cflags": "" },
+                { "id": "ppc64le-power10", "label": "Power10", "triple": "powerpc64le-linux-musl", "cflags": "" }
             ]
         }
     ]
