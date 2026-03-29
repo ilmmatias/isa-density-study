@@ -12,14 +12,20 @@
                     "cflags": ""
                 },
                 {
+                    "id": "x86-64-v1",
+                    "label": "x64-v1",
+                    "triple": "x86_64-linux-musl",
+                    "cflags": ""
+                },
+                {
                     "id": "x86-64-v3",
-                    "label": "x86-64-v3",
+                    "label": "x64-v3",
                     "triple": "x86_64-linux-musl",
                     "cflags": ""
                 },
                 {
                     "id": "x86-64-vnext",
-                    "label": "x86-64-vnext",
+                    "label": "x64-apx",
                     "triple": "x86_64-linux-musl",
                     "cflags": ""
                 },
@@ -42,8 +48,20 @@
                 },
                 {
                     "id": "armv8.2a-aarch64",
-                    "label": "ARMv8.2-A",
+                    "label": "ARMv8.2",
                     "triple": "aarch64-linux-musl",
+                    "cflags": ""
+                },
+                {
+                    "id": "armv9.5a-aarch64",
+                    "label": "ARMv9.5",
+                    "triple": "aarch64-linux-musl",
+                    "cflags": ""
+                },
+                {
+                    "id": "rv64g",
+                    "label": "RV64G",
+                    "triple": "riscv64-linux-musl",
                     "cflags": ""
                 },
                 {
@@ -65,7 +83,7 @@
                 },
                 {
                     "id": "rva23u64",
-                    "label": "RVA23U64",
+                    "label": "RVA23",
                     "triple": "riscv64-linux-musl",
                     "cflags": ""
                 }
