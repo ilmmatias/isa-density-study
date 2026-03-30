@@ -1,7 +1,0 @@
-{
-    "id": "i686",
-    "label": "i686",
-    "triple": "i686-linux-musl",
-    "bitness": 32,
-    "cflags": ""
-}

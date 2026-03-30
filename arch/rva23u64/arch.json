@@ -1,7 +1,0 @@
-{
-    "id": "rva23u64",
-    "label": "RVA23",
-    "triple": "riscv64-linux-musl",
-    "bitness": 64,
-    "cflags": ""
-}

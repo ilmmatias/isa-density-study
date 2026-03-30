@@ -1,0 +1,15 @@
+{
+    "id": "armv7m",
+    "label": "ARMv7-M",
+    "bitness": 32,
+    "fragments": {
+        "ARCH_ARM": true,
+        "ARCH_ARM_MODE_THUMB": true,
+        "ARCH_CPU": "cortex-m3",
+        "ARCH_BINFMT_FDPIC": true
+    },
+    "compiler": {
+        "triple": "arm-linux-musleabi",
+        "cflags": ""
+    }
+}

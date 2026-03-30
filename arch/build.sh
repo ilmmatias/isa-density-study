@@ -5,28 +5,41 @@ set -euo pipefail
 ARCH_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 . "$ARCH_DIR/env.sh"
 
+render_ctng_fragment() {
+    local arch_meta="$1"
+    jq -r '
+        .fragments // {} | to_entries[] |
+        if .value == true then "CT_\(.key)=y"
+        elif .value == false then "# CT_\(.key) is not set"
+        else "CT_\(.key)=\"\(.value)\""
+        end
+    ' "$arch_meta"
+}
+
 render_toolchain_config() {
     local arch="$1"
     local output="$2"
     local prefix="$3"
     local base="$ARCH_DIR/base.config"
-    local target="$ARCH_DIR/${arch}/cross.config"
+    local arch_meta="$ARCH_DIR/config/${arch}.json"
+    local arch_bitness
+    arch_bitness="$(arch_bitness "$arch")"
 
     if [[ ! -f "$base" ]]; then
-        echo "missing base config: $base" >&2
+        echo "$arch: missing base config: $base" >&2
         return 1
     fi
 
-    if [[ ! -f "$target" ]]; then
-        echo "$arch: no target fragment exists" >&2
+    if [[ ! -f "$arch_meta" ]]; then
+        echo "$arch: missing arch metadata" >&2
         return 1
     fi
 
     cp "$base" "$output"
     {
-        printf '\n# Target overrides for %s\n' "$arch"
-        cat "$target"
-        printf '\nCT_PREFIX_DIR="%s"\n' "$prefix"
+        printf '\n\nCT_PREFIX_DIR="%s"\n' "$prefix"
+        printf '\nCT_ARCH_%d=y\n' "$arch_bitness"
+        render_ctng_fragment "$arch_meta"
     } >> "$output"
 }
 
@@ -47,7 +60,7 @@ build_toolchain() {
     ct-ng olddefconfig
     cp .config rendered.config
     ct-ng build
-    rm -f .config .config.old build.log
+    rm -f .config .config.old rendered.config build.log
 }
 
 if [[ $# -gt 0 ]]; then

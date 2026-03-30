@@ -1,0 +1,13 @@
+{
+    "id": "i686",
+    "label": "i686",
+    "bitness": 32,
+    "fragments": {
+        "ARCH_X86": true,
+        "ARCH_ARCH": "i686"
+    },
+    "compiler": {
+        "triple": "i686-linux-musl",
+        "cflags": ""
+    }
+}

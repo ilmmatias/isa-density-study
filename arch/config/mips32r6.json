@@ -1,0 +1,14 @@
+{
+    "id": "mips32r6",
+    "label": "MIPS32r6",
+    "bitness": 32,
+    "fragments": {
+        "ARCH_MIPS": true,
+        "ARCH_LE": true,
+        "ARCH_ARCH": "mips32r6"
+    },
+    "compiler": {
+        "triple": "mipsel-linux-musl",
+        "cflags": ""
+    }
+}

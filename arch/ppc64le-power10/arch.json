@@ -1,7 +1,0 @@
-{
-    "id": "ppc64le-power10",
-    "label": "Power10",
-    "triple": "powerpc64le-linux-musl",
-    "bitness": 64,
-    "cflags": ""
-}

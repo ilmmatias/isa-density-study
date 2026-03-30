@@ -1,7 +1,0 @@
-{
-    "id": "armv7a-arm",
-    "label": "ARMv7-A",
-    "triple": "arm-linux-musleabi",
-    "bitness": 32,
-    "cflags": ""
-}

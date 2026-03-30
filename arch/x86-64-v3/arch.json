@@ -1,7 +1,0 @@
-{
-    "id": "x86-64-v3",
-    "label": "x64-v3",
-    "triple": "x86_64-linux-musl",
-    "bitness": 64,
-    "cflags": ""
-}

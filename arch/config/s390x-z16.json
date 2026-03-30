@@ -1,0 +1,13 @@
+{
+    "id": "s390x-z16",
+    "label": "z16",
+    "bitness": 64,
+    "fragments": {
+        "ARCH_S390": true,
+        "CC_GCC_EXTRA_CONFIG_ARRAY": "--with-arch=z16"
+    },
+    "compiler": {
+        "triple": "s390x-linux-musl",
+        "cflags": ""
+    }
+}

@@ -1,0 +1,13 @@
+{
+    "id": "rv64g",
+    "label": "RV64G",
+    "bitness": 64,
+    "fragments": {
+        "ARCH_RISCV": true,
+        "ARCH_ARCH": "rv64g"
+    },
+    "compiler": {
+        "triple": "riscv64-linux-musl",
+        "cflags": ""
+    }
+}

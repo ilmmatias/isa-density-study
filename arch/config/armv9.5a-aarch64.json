@@ -1,0 +1,13 @@
+{
+    "id": "armv9.5a-aarch64",
+    "label": "ARMv9.5",
+    "bitness": 64,
+    "fragments": {
+        "ARCH_ARM": true,
+        "ARCH_ARCH": "armv9.5-a"
+    },
+    "compiler": {
+        "triple": "aarch64-linux-musl",
+        "cflags": ""
+    }
+}

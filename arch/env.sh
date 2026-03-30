@@ -34,23 +34,18 @@ for arch in "${INDEX_ARCHS[@]}"; do
         exit 1
     fi
 
-    arch_meta="$ARCH_DIR/$arch/arch.json"
-    arch_ctng="$ARCH_DIR/$arch/cross.config"
+    arch_meta="$ARCH_DIR/config/$arch.json"
     if [[ ! -f "$arch_meta" ]]; then
         echo "$arch: missing architecture metadata at $arch_meta" >&2
         exit 1
     fi
-    if [[ ! -f "$arch_ctng" ]]; then
-        echo "$arch: missing crosstool-NG fragment at $arch_ctng" >&2
-        exit 1
-    fi
 
     IFS=$'\t' read -r id triple bitness cflags < <(
-        jq -r '[.id, .triple, (.bitness | tostring), .cflags] | @tsv' "$arch_meta"
+        jq -r '[.id, .compiler.triple, (.bitness | tostring), .compiler.cflags] | @tsv' "$arch_meta"
     )
 
     if [[ "$id" != "$arch" ]]; then
-        echo "$arch: arch.json id mismatch ($id)" >&2
+        echo "$arch: id mismatch ($id)" >&2
         exit 1
     fi
 

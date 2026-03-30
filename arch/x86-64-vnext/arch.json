@@ -1,7 +1,0 @@
-{
-    "id": "x86-64-vnext",
-    "label": "x64-next",
-    "triple": "x86_64-linux-musl",
-    "bitness": 64,
-    "cflags": ""
-}

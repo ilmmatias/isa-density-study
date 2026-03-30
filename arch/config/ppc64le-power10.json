@@ -1,0 +1,15 @@
+{
+    "id": "ppc64le-power10",
+    "label": "Power10",
+    "bitness": 64,
+    "fragments": {
+        "ARCH_POWERPC": true,
+        "ARCH_LE": true,
+        "ARCH_CPU": "power10",
+        "LIBC_MUSL_EXTRA_CFLAGS": "-mno-pcrel"
+    },
+    "compiler": {
+        "triple": "powerpc64le-linux-musl",
+        "cflags": ""
+    }
+}

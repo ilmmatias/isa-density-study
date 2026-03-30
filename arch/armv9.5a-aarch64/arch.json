@@ -1,7 +1,0 @@
-{
-    "id": "armv9.5a-aarch64",
-    "label": "ARMv9.5",
-    "triple": "aarch64-linux-musl",
-    "bitness": 64,
-    "cflags": ""
-}

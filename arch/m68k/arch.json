@@ -1,7 +1,0 @@
-{
-    "id": "m68k",
-    "label": "m68k",
-    "triple": "m68k-linux-musl",
-    "bitness": 32,
-    "cflags": ""
-}

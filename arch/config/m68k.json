@@ -1,0 +1,12 @@
+{
+    "id": "m68k",
+    "label": "m68k",
+    "bitness": 32,
+    "fragments": {
+        "ARCH_M68K": true
+    },
+    "compiler": {
+        "triple": "m68k-linux-musl",
+        "cflags": ""
+    }
+}

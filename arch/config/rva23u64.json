@@ -1,0 +1,13 @@
+{
+    "id": "rva23u64",
+    "label": "RVA23",
+    "bitness": 64,
+    "fragments": {
+        "ARCH_RISCV": true,
+        "ARCH_ARCH": "rv64gcbv_zicntr_zihpm_ziccif_ziccrse_ziccamoa_zicclsm_za64rs_zihintpause_zic64b_zicbom_zicbop_zicboz_zfhmin_zkt_zvfhmin_zvbb_zvkt_zihintntl_zicond_zimop_zcmop_zcb_zfa_zawrs"
+    },
+    "compiler": {
+        "triple": "riscv64-linux-musl",
+        "cflags": ""
+    }
+}

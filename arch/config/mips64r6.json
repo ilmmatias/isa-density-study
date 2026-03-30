@@ -1,0 +1,15 @@
+{
+    "id": "mips64r6",
+    "label": "MIPS64r6",
+    "bitness": 64,
+    "fragments": {
+        "ARCH_MIPS": true,
+        "ARCH_LE": true,
+        "ARCH_mips_n64": true,
+        "ARCH_ARCH": "mips64r6"
+    },
+    "compiler": {
+        "triple": "mips64el-linux-musl",
+        "cflags": ""
+    }
+}

@@ -1,0 +1,13 @@
+{
+    "id": "armv8.2a-aarch64",
+    "label": "ARMv8.2",
+    "bitness": 64,
+    "fragments": {
+        "ARCH_ARM": true,
+        "ARCH_ARCH": "armv8.2-a"
+    },
+    "compiler": {
+        "triple": "aarch64-linux-musl",
+        "cflags": ""
+    }
+}

@@ -1,0 +1,13 @@
+{
+    "id": "x86-64-vnext",
+    "label": "x64-next",
+    "bitness": 64,
+    "fragments": {
+        "ARCH_X86": true,
+        "ARCH_ARCH": "diamondrapids"
+    },
+    "compiler": {
+        "triple": "x86_64-linux-musl",
+        "cflags": ""
+    }
+}

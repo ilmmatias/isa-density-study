@@ -1,8 +1,6 @@
 set -euo pipefail
 
-arch_home()          { echo "$TOOLCHAIN_ROOT/$1"; }
-arch_prefix_dir()    { echo "$(arch_home "$1")/.prefix"; }
-arch_work_dir()      { echo "$(arch_home "$1")/.work"; }
+arch_prefix_dir()    { echo "$ARCH_DIR/.prefix/$1"; }
 arch_bindir()        { echo "$(arch_prefix_dir "$1")/bin"; }
 arch_tool()          { echo "$(arch_bindir "$1")/$(arch_triple "$1")-$2"; }
 arch_gcc()           { arch_tool "$1" gcc; }
