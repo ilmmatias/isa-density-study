@@ -1,0 +1,7 @@
+{
+    "id": "s390x-z16",
+    "label": "z16",
+    "triple": "s390x-linux-musl",
+    "bitness": 64,
+    "cflags": ""
+}

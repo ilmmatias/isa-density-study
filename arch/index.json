@@ -1,0 +1,37 @@
+{
+    "profiles": [
+        { "id": "speed", "label": "-O2", "cflags": "-O2 -pipe" },
+        { "id": "size", "label": "-Os", "cflags": "-Os -pipe" }
+    ],
+    "normalize": {
+        "32": "i686",
+        "64": "x86-64-v3"
+    },
+    "groups": [
+        {
+            "label": "CISC",
+            "archs": [
+                "m68k",
+                "i686",
+                "x86-64-v1",
+                "x86-64-v3",
+                "x86-64-vnext",
+                "s390x-z16"
+            ]
+        },
+        {
+            "label": "RISC",
+            "archs": [
+                "mips32r6",
+                "armv7a-arm",
+                "armv7m",
+                "mips64r6",
+                "armv8.2a-aarch64",
+                "armv9.5a-aarch64",
+                "rv64g",
+                "rva23u64",
+                "ppc64le-power10"
+            ]
+        }
+    ]
+}

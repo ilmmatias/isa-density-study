@@ -4,7 +4,7 @@ set -euo pipefail
 
 WORKLOAD_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-. "$WORKLOAD_DIR/../../config/env.sh"
+. "$WORKLOAD_DIR/../../arch/env.sh"
 . "$WORKLOAD_DIR/../common.sh"
 
 load_workload_config "$WORKLOAD_DIR"

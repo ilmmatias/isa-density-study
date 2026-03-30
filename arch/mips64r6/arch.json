@@ -1,0 +1,7 @@
+{
+    "id": "mips64r6",
+    "label": "MIPS64r6",
+    "triple": "mips64el-linux-musl",
+    "bitness": 64,
+    "cflags": ""
+}

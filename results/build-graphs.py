@@ -16,10 +16,10 @@ from matplotlib.transforms import blended_transform_factory
 SCRIPT_DIR = Path(__file__).parent.resolve()
 REPO_ROOT = SCRIPT_DIR.parent
 
-CONFIG_DIR = REPO_ROOT / "config"
+ARCH_DIR = REPO_ROOT / "arch"
 WORKLOADS_DIR = REPO_ROOT / "workloads"
 
-ARCH_CONFIG = CONFIG_DIR / "archs.json"
+ARCH_INDEX = ARCH_DIR / "index.json"
 DEFAULT_INPUT_CSV = SCRIPT_DIR / "data" / "results.csv"
 DEFAULT_PLOTS_DIR = SCRIPT_DIR / "plots"
 
@@ -32,7 +32,8 @@ METRIC_INFO = {
 
 
 def load_arch_config(
-    path: Path,
+    index_path: Path,
+    arch_root: Path,
 ) -> tuple[
     dict[str, str],
     dict[int, list[tuple[str, list[str]]]],
@@ -40,30 +41,54 @@ def load_arch_config(
     dict[int, str],
     list[tuple[str, str]],
 ]:
-    with open(path, "r", encoding="utf-8") as f:
-        data = json.load(f)
+    with open(index_path, "r", encoding="utf-8") as f:
+        index = json.load(f)
 
     labels: dict[str, str] = {}
-    groups_by_bitness: dict[int, list[tuple[str, list[str]]]] = {}
     arch_bitness: dict[str, int] = {}
-    normalize_by_bitness: dict[int, str] = {}
+    groups_by_bitness: dict[int, list[tuple[str, list[str]]]] = {}
+    normalize_by_bitness = {
+        int(bits): arch_id for bits, arch_id in index["normalize"].items()
+    }
 
-    for bitness in data["bitness"]:
-        bits = int(bitness["bits"])
-        normalize_by_bitness[bits] = bitness["normalize"]
+    group_order = [(group["label"], group["archs"]) for group in index["groups"]]
+    ordered_arch_ids: list[str] = []
+    seen_arch_ids: set[str] = set()
+    for _, arch_ids in group_order:
+        for arch_id in arch_ids:
+            if arch_id in seen_arch_ids:
+                raise RuntimeError(f"duplicate architecture id in {index_path}: {arch_id}")
+            ordered_arch_ids.append(arch_id)
+            seen_arch_ids.add(arch_id)
 
+    for arch_id in ordered_arch_ids:
+        arch_path = arch_root / arch_id / "arch.json"
+        with open(arch_path, "r", encoding="utf-8") as f:
+            arch = json.load(f)
+
+        if arch["id"] != arch_id:
+            raise RuntimeError(f"{arch_path}: id mismatch ({arch['id']})")
+
+        labels[arch_id] = arch["label"]
+        arch_bitness[arch_id] = int(arch["bitness"])
+
+    for bits, arch_id in normalize_by_bitness.items():
+        if arch_id not in arch_bitness:
+            raise RuntimeError(f"normalize target missing from {index_path}: {arch_id}")
+        if arch_bitness[arch_id] != bits:
+            raise RuntimeError(
+                f"normalize target {arch_id} has bitness {arch_bitness[arch_id]}, expected {bits}"
+            )
+
+    for bits in sorted(set(arch_bitness.values())):
         groups: list[tuple[str, list[str]]] = []
-        for group in bitness["groups"]:
-            arch_ids: list[str] = []
-            for arch in group["archs"]:
-                labels[arch["id"]] = arch["label"]
-                arch_bitness[arch["id"]] = bits
-                arch_ids.append(arch["id"])
-            groups.append((group["label"], arch_ids))
-
+        for group_label, arch_ids in group_order:
+            filtered = [arch_id for arch_id in arch_ids if arch_bitness.get(arch_id) == bits]
+            if filtered:
+                groups.append((group_label, filtered))
         groups_by_bitness[bits] = groups
 
-    profiles = [(profile["id"], profile["label"]) for profile in data["profiles"]]
+    profiles = [(profile["id"], profile["label"]) for profile in index["profiles"]]
     return labels, groups_by_bitness, arch_bitness, normalize_by_bitness, profiles
 
 
@@ -308,7 +333,10 @@ def main() -> None:
     input_csv = Path(os.environ.get("RESULTS_CSV", str(DEFAULT_INPUT_CSV)))
     plots_dir = Path(os.environ.get("RESULTS_PLOTS_DIR", str(DEFAULT_PLOTS_DIR)))
 
-    arch_labels_map, arch_groups_by_bitness, arch_bitness, normalize_by_bitness, profiles = load_arch_config(ARCH_CONFIG)
+    arch_labels_map, arch_groups_by_bitness, arch_bitness, normalize_by_bitness, profiles = load_arch_config(
+        ARCH_INDEX,
+        ARCH_DIR,
+    )
     workloads = load_workloads(WORKLOADS_DIR)
     rows = load_results(input_csv)
     if not rows:

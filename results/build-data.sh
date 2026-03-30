@@ -3,7 +3,7 @@
 set -euo pipefail
 
 RESULTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-. "$RESULTS_DIR/../config/env.sh"
+. "$RESULTS_DIR/../arch/env.sh"
 . "$RESULTS_DIR/../workloads/common.sh"
 
 RESULTS_DATA_DIR="${RESULTS_DATA_DIR:-$RESULTS_DIR/data}"

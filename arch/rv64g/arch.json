@@ -1,0 +1,7 @@
+{
+    "id": "rv64g",
+    "label": "RV64G",
+    "triple": "riscv64-linux-musl",
+    "bitness": 64,
+    "cflags": ""
+}
