@@ -7,7 +7,7 @@
         "CC_GCC_EXTRA_CONFIG_ARRAY": "--with-arch=z16"
     },
     "compiler": {
-        "triple": "s390x-linux-musl",
+        "triple": "s390x-ibm-linux-musl",
         "cflags": ""
     }
 }

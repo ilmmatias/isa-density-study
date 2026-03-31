@@ -7,7 +7,7 @@
         "ARCH_ARCH": "i686"
     },
     "compiler": {
-        "triple": "i686-linux-musl",
+        "triple": "i686-unknown-linux-musl",
         "cflags": ""
     }
 }

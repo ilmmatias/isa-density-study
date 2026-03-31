@@ -9,7 +9,7 @@
         "ARCH_BINFMT_FDPIC": true
     },
     "compiler": {
-        "triple": "arm-linux-musleabi",
+        "triple": "arm-unknown-linux-musleabi",
         "cflags": ""
     }
 }

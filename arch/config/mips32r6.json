@@ -8,7 +8,7 @@
         "ARCH_ARCH": "mips32r6"
     },
     "compiler": {
-        "triple": "mipsel-linux-musl",
+        "triple": "mipsel-unknown-linux-musl",
         "cflags": ""
     }
 }

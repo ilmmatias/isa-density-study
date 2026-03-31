@@ -10,7 +10,7 @@
         "ARCH_FLOAT_HW": true
     },
     "compiler": {
-        "triple": "arm-linux-musleabi",
+        "triple": "arm-unknown-linux-musleabihf",
         "cflags": ""
     }
 }

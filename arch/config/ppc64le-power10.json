@@ -9,7 +9,7 @@
         "LIBC_MUSL_EXTRA_CFLAGS": "-mno-pcrel"
     },
     "compiler": {
-        "triple": "powerpc64le-linux-musl",
+        "triple": "powerpc64le-unknown-linux-musl",
         "cflags": ""
     }
 }

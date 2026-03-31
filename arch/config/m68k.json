@@ -6,7 +6,7 @@
         "ARCH_M68K": true
     },
     "compiler": {
-        "triple": "m68k-linux-musl",
+        "triple": "m68k-unknown-linux-musl",
         "cflags": ""
     }
 }

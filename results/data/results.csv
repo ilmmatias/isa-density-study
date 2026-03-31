@@ -67,7 +67,7 @@ zlib,x86-64-vnext,speed,59712,14215,4.2006
 zlib,s390x-z16,speed,66768,14219,4.6957
 zlib,mips32r6,speed,61088,15255,4.0045
 zlib,armv7a-arm,speed,54612,13653,4.0000
-zlib,armv7m,speed,36836,13568,2.7149
+zlib,armv7m,speed,37188,13722,2.7101
 zlib,mips64r6,speed,63392,15824,4.0061
 zlib,armv8.2a-aarch64,speed,52428,13107,4.0000
 zlib,armv9.5a-aarch64,speed,52208,13052,4.0000
@@ -82,7 +82,7 @@ zlib,x86-64-vnext,size,42170,10783,3.9108
 zlib,s390x-z16,size,53696,11222,4.7849
 zlib,mips32r6,size,52176,13023,4.0065
 zlib,armv7a-arm,size,45884,11471,4.0000
-zlib,armv7m,size,29214,11174,2.6145
+zlib,armv7m,size,29538,11316,2.6103
 zlib,mips64r6,size,52832,13197,4.0033
 zlib,armv8.2a-aarch64,size,43096,10774,4.0000
 zlib,armv9.5a-aarch64,size,43152,10788,4.0000

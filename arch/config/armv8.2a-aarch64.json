@@ -7,7 +7,7 @@
         "ARCH_ARCH": "armv8.2-a"
     },
     "compiler": {
-        "triple": "aarch64-linux-musl",
+        "triple": "aarch64-unknown-linux-musl",
         "cflags": ""
     }
 }

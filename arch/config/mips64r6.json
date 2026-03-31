@@ -9,7 +9,7 @@
         "ARCH_ARCH": "mips64r6"
     },
     "compiler": {
-        "triple": "mips64el-linux-musl",
+        "triple": "mips64el-unknown-linux-musl",
         "cflags": ""
     }
 }

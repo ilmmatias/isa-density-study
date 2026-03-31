@@ -10,23 +10,24 @@ export ARCH_WORK_DIR="$ARCH_DIR/.work"
 
 ARCH_INDEX="$ARCH_DIR/index.json"
 
-mapfile -t PROFILES < <(jq -r '.profiles[].id' "$ARCH_INDEX")
-
 declare -A PROFILE_LABELS
 declare -A PROFILE_CFLAGS
-declare -A ARCH_TRIPLES
-declare -A ARCH_BITNESS
-declare -A ARCH_EXTRA_CFLAGS
-declare -A NORMALIZE_ARCHES
+
+mapfile -t PROFILES < <(jq -r '.profiles[].id' "$ARCH_INDEX")
 
 while IFS=$'\t' read -r id label cflags; do
     PROFILE_LABELS[$id]="$label"
     PROFILE_CFLAGS[$id]="$cflags"
 done < <(jq -r '.profiles[] | [.id, .label, .cflags] | @tsv' "$ARCH_INDEX")
 
-mapfile -t INDEX_ARCHS < <(jq -r '.groups[].archs[]' "$ARCH_INDEX")
-ARCHS=()
+declare -A ARCH_TRIPLES
+declare -A ARCH_BITNESS
+declare -A ARCH_EXTRA_CFLAGS
+declare -A NORMALIZE_ARCHES
 declare -A SEEN_ARCHS
+ARCHS=()
+
+mapfile -t INDEX_ARCHS < <(jq -r '.groups[].archs[]' "$ARCH_INDEX")
 
 for arch in "${INDEX_ARCHS[@]}"; do
     if [[ -v SEEN_ARCHS[$arch] ]]; then

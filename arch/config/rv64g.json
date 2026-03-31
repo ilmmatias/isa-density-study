@@ -4,10 +4,11 @@
     "bitness": 64,
     "fragments": {
         "ARCH_RISCV": true,
+        "ARCH_USE_MMU": true,
         "ARCH_ARCH": "rv64g"
     },
     "compiler": {
-        "triple": "riscv64-linux-musl",
+        "triple": "riscv64-unknown-linux-musl",
         "cflags": ""
     }
 }

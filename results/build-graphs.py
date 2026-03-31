@@ -62,7 +62,7 @@ def load_arch_config(
             seen_arch_ids.add(arch_id)
 
     for arch_id in ordered_arch_ids:
-        arch_path = arch_root / arch_id / "arch.json"
+        arch_path = arch_root / 'config' / f"{arch_id}.json"
         with open(arch_path, "r", encoding="utf-8") as f:
             arch = json.load(f)
 
