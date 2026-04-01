@@ -2,11 +2,12 @@
 
 set -euo pipefail
 
-RESULTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DATA_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+RESULTS_DIR="$(cd "$DATA_DIR/.." && pwd)"
 . "$RESULTS_DIR/../arch/env.sh"
 . "$RESULTS_DIR/../workloads/common.sh"
 
-RESULTS_DATA_DIR="${RESULTS_DATA_DIR:-$RESULTS_DIR/data}"
+RESULTS_DATA_DIR="${RESULTS_DATA_DIR:-$DATA_DIR}"
 RESULTS_CSV="${RESULTS_CSV:-$RESULTS_DATA_DIR/results.csv}"
 WORKLOADS_DIR="$REPO_ROOT/workloads"
 
